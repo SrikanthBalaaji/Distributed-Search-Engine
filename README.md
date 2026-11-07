@@ -164,6 +164,7 @@ nano config/local.env                     # NODE_ID=1|2|3|4, JAVA_HOME, HADOOP_H
 bash scripts/setup_hosts.sh
 
 # 5) Nodes 1, 2, 3 only
+bash scripts/install_python310.sh         # Spark 3.3 needs Python <= 3.10 (Ubuntu 24.04 has 3.12)
 bash scripts/install_iceberg.sh
 bash scripts/render_configs.sh            # writes config/generated/nodeN/{hadoop,spark}
 
@@ -340,7 +341,7 @@ python3 -m pytest -q tests
 | Job hangs at "Initial job has not accepted any resources" | Worker memory is too small for `SPARK_EXECUTOR_MEMORY`, or executors can't reach the driver. Make sure `spark.driver.host` is the driver node's ZeroTier IP and ports 7078/7079 are open. |
 | `UnknownHostException: dse-node3` | Run `bash scripts/setup_hosts.sh` on that VM (Node 4 too: WebHDFS redirects to DataNodes by name). |
 | `Python in worker has different version` | Install the same Python minor version on Nodes 1–3, or point `PYSPARK_PYTHON` at it in `local.env`. |
-| Exception mentioning `distutils` / cloudpickle on Python 3.11+ | Spark 3.3 supports Python ≤ 3.10. Install `python3.10` and set `PYSPARK_PYTHON=python3.10`. |
+| Exception mentioning `distutils` / cloudpickle on Python 3.11+ | Spark 3.3 supports Python ≤ 3.10. Run `bash scripts/install_python310.sh` (deadsnakes PPA, or uv as a fallback), then `bash scripts/render_configs.sh`. |
 | `Iceberg catalog ... not configured` | Submit jobs via `scripts/submit.sh` (it passes the generated `spark-defaults.conf`). |
 | Export says "pages has a newer snapshot" | Ingestion ran after indexing. Run the full `run_pipeline.sh`. |
 | Node 4 never switches | `bash vm4_search/pull_export.sh` prints why. Rejected versions go to `$SERVING_DIR/.rejected-vN`. |

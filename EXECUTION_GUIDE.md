@@ -83,13 +83,15 @@ bash scripts/setup_hosts.sh
 ```
 ✅ It prints `dse-node1` … `dse-node4`, each with the correct IP.
 
-### Step 5 · Nodes 1, 2, 3 · install Iceberg and generate configs
+### Step 5 · Nodes 1, 2, 3 · install Python 3.10 and Iceberg, generate configs
 
+Spark 3.3 does **not** work with Python 3.11+ (Ubuntu 24.04 has 3.12), so we add Python 3.10 next to it:
 ```bash
+bash scripts/install_python310.sh
 bash scripts/install_iceberg.sh
 bash scripts/render_configs.sh
 ```
-✅ You see `SHA-1 verification: OK` and `[render] done.`
+✅ You see `[py310] OK: 3.10.x`, `SHA-1 verification: OK` and `[render] done.`
 
 ### Step 6 · Node 4 · install Python packages
 
@@ -318,7 +320,7 @@ Next session: start again from **Part 2**. Your data is still there in HDFS.
 |---|---|
 | `permission denied` | Put `bash` in front of the command. |
 | `Unable to load native-hadoop library` (Node 2, arm64) | Harmless warning, ignore it. |
-| `Python in worker has different version` | Nodes 1, 2, 3 must run the same Python minor version. Check with `python3 --version` on each. |
+| `Python in worker has different version`, or a `cloudpickle` / `code()` TypeError | Run `bash scripts/install_python310.sh` on Nodes 1, 2, 3, then `bash scripts/render_configs.sh`. Check with `python3.10 --version`. |
 | A node can't be reached | `sudo zerotier-cli listnetworks` must say `OK`. Restart with `sudo systemctl restart zerotier-one`. |
 | `NODE_ID not set` | You skipped Step 3. Create `config/local.env`. |
 | Only **1** live DataNode | On Node 3: run `jps`. If `DataNode` is missing, run `bash vm3_compute/start_compute.sh` again. |
