@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DSE Search</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='13' cy='13' r='8' fill='none' stroke='%232563eb' stroke-width='3.5'/><path d='M19 19l8 8' stroke='%232563eb' stroke-width='3.5' stroke-linecap='round'/></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="DSE Search home">
+      <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><circle cx="13" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M19 19l8 8" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <span>DSE<b>Search</b></span>
+    </a>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="search" role="tab">Search</button>
+      <button class="tab" data-tab="compare" role="tab">Compare phases</button>
+      <button class="tab" data-tab="index" role="tab">Index &amp; versions</button>
+    </nav>
+    <div id="versionBadge" class="badge" title="Active serving version">connecting…</div>
+  </header>
+
+  <main>
+    <!-- ================= SEARCH ================= -->
+    <section id="tab-search" class="panel active">
+      <form id="searchForm" class="searchbar" autocomplete="off">
+        <input id="q" name="q" type="search" placeholder="Search the Simple English Wikipedia corpus…" autofocus aria-label="Query">
+        <select id="versionSelect" aria-label="Version" title="Search a specific version"></select>
+        <button type="submit" class="primary">Search</button>
+      </form>
+      <div class="hints" id="hints">
+        Try: <a href="#" data-q="solar system planet">solar system planet</a>
+        <a href="#" data-q="world war">world war</a>
+        <a href="#" data-q="vitamin c">vitamin c</a>
+        <a href="#" data-q="music instrument">music instrument</a>
+        <a href="#" data-q="plant">plant</a>
+      </div>
+      <div id="meta" class="meta"></div>
+      <ol id="results" class="results"></ol>
+      <div id="pager" class="pager"></div>
+      <p class="formula">Ranking: <code>score = 0.7 · BM25/max(BM25) + 0.3 · PageRank/max(PageRank)</code>
+        &nbsp;·&nbsp; BM25 k₁=1.2, b=0.75 &nbsp;·&nbsp; PageRank d=0.85</p>
+    </section>
+
+    <!-- ================= COMPARE ================= -->
+    <section id="tab-compare" class="panel">
+      <form id="compareForm" class="searchbar" autocomplete="off">
+        <input id="cq" type="search" placeholder="Query to compare across versions…" aria-label="Compare query">
+        <select id="cmpA" aria-label="Old version"></select>
+        <span class="arrow">→</span>
+        <select id="cmpB" aria-label="New version"></select>
+        <button type="submit" class="primary">Compare</button>
+      </form>
+      <p class="muted small">Shows how the same query ranks before and after a change set (e.g. Phase 0 → Phase 1).</p>
+      <div id="compareOut" class="compare"></div>
+    </section>
+
+    <!-- ================= INDEX ================= -->
+    <section id="tab-index" class="panel">
+      <div class="grid2">
+        <div class="card">
+          <h3>Serving versions</h3>
+          <p class="muted small">Exports pulled from HDFS <code>/serving/vN</code>. Activating an older version is an instant rollback of the search layer.</p>
+          <table class="tbl" id="versionsTbl"><thead><tr><th>Version</th><th>Phase</th><th>Docs</th><th>Created</th><th></th></tr></thead><tbody></tbody></table>
+          <div class="row">
+            <button id="pullBtn" class="secondary">Pull new exports from HDFS</button>
+            <input id="adminToken" type="password" placeholder="admin token (if set)" aria-label="Admin token">
+          </div>
+          <pre id="pullOut" class="log hidden"></pre>
+        </div>
+        <div class="card">
+          <h3>Active index</h3>
+          <dl id="statsList" class="stats"></dl>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Top documents by PageRank</h3>
+          <table class="tbl" id="prTbl"><thead><tr><th>#</th><th>Title</th><th>PageRank</th><th>In-links</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Export validation &amp; lineage</h3>
+          <div id="lineage"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- document drawer -->
+  <div id="drawer" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-inner">
+      <button class="close" id="drawerClose" aria-label="Close">×</button>
+      <div id="drawerBody"></div>
+    </div>
+  </div>
+
+  <footer>Distributed Search Engine · HDFS · Spark · Iceberg · FastAPI · Node 4</footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

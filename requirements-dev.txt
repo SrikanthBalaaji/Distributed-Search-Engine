@@ -1,0 +1,3 @@
+# Local development / tests (any laptop). Spark itself comes from $SPARK_HOME on the VMs.
+-r vm4_search/requirements.txt
+pytest>=7

@@ -1,0 +1,8 @@
+# Repo is edited on Windows but runs on Linux VMs: always keep LF endings.
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.jsonl text eol=lf
+*.pdf binary
+*.parquet binary
+*.jar binary

@@ -1,0 +1,22 @@
+# per-VM settings and generated configs (never commit these)
+config/local.env
+config/generated/
+
+# build / runtime artefacts
+build/
+logs/
+.local/
+.work/
+vm4_search/.venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+spark-warehouse/
+metastore_db/
+derby.log
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
