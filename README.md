@@ -7,7 +7,7 @@ Every VM clones this same repo. Each team member works in their own `vmN_*` fold
 > **New to the project? Start with [EXECUTION_GUIDE.md](EXECUTION_GUIDE.md)**: a simple step-by-step of who runs what, and when.
 
 ```
-                       ZeroTier private network (10.147.17.0/24 - use your own IPs)
+                       ZeroTier private network (172.27.0.0/16)
  ┌──────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────┐
  │ NODE 1 Ingestion │   │ NODE 2 Storage           │   │ NODE 3 Compute           │   │ NODE 4 Search    │
  │                  │   │                          │   │                          │   │                  │
@@ -21,12 +21,12 @@ Every VM clones this same repo. Each team member works in their own `vmN_*` fold
                                     └───────────────── WebHDFS :9870 ──────────────┴───────────┘
 ```
 
-| Node | Owner | Daemons | This member runs |
-|---|---|---|---|
-| **1** Ingestion | member 1 | none (Spark/HDFS **client** only) | `vm1_ingestion/run_phase.sh 0\|1` |
-| **2** Storage | member 2 | HDFS NameNode + DataNode, Spark Worker | `vm2_storage/setup_hdfs.sh`, `start_storage.sh`, `iceberg_admin.sh` |
-| **3** Compute | member 3 | Spark Master + Worker, HDFS DataNode | `vm3_compute/start_compute.sh`, `run_pipeline.sh` |
-| **4** Search | member 4 | FastAPI only | `vm4_search/setup_node4.sh`, `run_search.sh` |
+| Node | Owner | ZeroTier IP | Daemons | This member runs |
+|---|---|---|---|---|
+| **1** Ingestion | Nikhil | 172.27.211.189 | none (Spark/HDFS **client** only) | `vm1_ingestion/run_phase.sh 0\|1` |
+| **2** Storage | Sathya | 172.27.180.147 | HDFS NameNode + DataNode, Spark Worker | `vm2_storage/setup_hdfs.sh`, `start_storage.sh`, `iceberg_admin.sh` |
+| **3** Compute | Srikanth | 172.27.143.38 | Spark Master + Worker, HDFS DataNode | `vm3_compute/start_compute.sh`, `run_pipeline.sh` |
+| **4** Search | Sushanth | 172.27.88.66 | FastAPI only | `vm4_search/setup_node4.sh`, `run_search.sh` |
 
 ---
 
@@ -140,6 +140,7 @@ These match the Iceberg hands-on (Java 11, Hadoop 3.3.6, Spark 3.3.4, Iceberg 1.
 * **Clock sync:** suspended VMs drift, and Spark/HDFS dislike skewed clocks. Run `sudo timedatectl set-ntp true`, or enable VMware Tools time sync.
 * **Firewall:** Ubuntu's `ufw` is usually inactive. If it's enabled, allow the ZeroTier interface: `sudo ufw allow in on zt+`.
 * **Suspend/resume:** after resuming a VM, check `zerotier-cli listnetworks` (status `OK`) before starting daemons.
+* **Mixed CPU architectures:** Node 2 (Sathya) and Node 4 (Sushanth) are `arm64`; Node 1 (Nikhil) and Node 3 (Srikanth) are `x86_64`. That's fine, because Hadoop, Spark and Iceberg run on the JVM and our Python code is pure Python. Node 4's pip packages (numpy, pandas, pyarrow, fastapi) all ship arm64 wheels. On Node 2, install Java with `sudo apt install openjdk-11-jdk` (apt picks the arm64 build) and use the same Hadoop/Spark tarballs. The warning `Unable to load native-hadoop library for your platform` is harmless. Python must still be the same minor version (for example 3.10) on Nodes 1–3.
 
 ---
 

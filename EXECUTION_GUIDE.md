@@ -7,12 +7,17 @@ Follow the steps **in order**. Wait for the ✅ check before moving on.
 
 ## Who is who
 
-| Node | Job | Person |
-|:---:|---|---|
-| **Node 1** | Ingestion: uploads data and runs the ingestion job | __________ |
-| **Node 2** | Storage: HDFS NameNode + DataNode, Spark Worker, Iceberg tables | __________ |
-| **Node 3** | Compute: Spark Master + Worker, HDFS DataNode, runs index / PageRank / export | __________ |
-| **Node 4** | Search: website + search API | __________ |
+| Node | Job | Person | ZeroTier IP |
+|:---:|---|---|---|
+| **Node 1** | Ingestion: uploads data and runs the ingestion job | Nikhil | `172.27.211.189` |
+| **Node 2** | Storage: HDFS NameNode + DataNode, Spark Worker, Iceberg tables | Sathya | `172.27.180.147` |
+| **Node 3** | Compute: Spark Master + Worker, HDFS DataNode, runs index / PageRank / export | Srikanth | `172.27.143.38` |
+| **Node 4** | Search: website + search API | Sushanth | `172.27.88.66` |
+
+Handy links once the cluster is running:
+* Spark master UI: http://172.27.143.38:8080
+* HDFS NameNode UI: http://172.27.180.147:9870
+* Search website: http://172.27.88.66:8000
 
 > **Rule 1:** run every command from inside the repo folder: `cd ~/Distributed-Search-Engine`
 > **Rule 2:** always start commands with `bash` (example: `bash scripts/check_cluster.sh`).
@@ -35,18 +40,14 @@ For every phase it is always the same 3 steps: **Node 1 → Node 3 → Node 4 (a
 
 # PART 1: One-time setup (do this only once)
 
-### Step 1 · Team lead · put everyone's IP in the config
+### Step 1 · ALL 4 nodes · make sure ZeroTier is online
 
-Everyone sends their ZeroTier IP to the lead. Find yours with:
+The IPs are already filled in `config/cluster.env` (see the table above). Check that yours matches:
 ```bash
+sudo zerotier-cli listnetworks      # status must be OK, and the IP must match the table
 ip -4 addr show | grep -A2 zt
 ```
-The lead edits `config/cluster.env` (the `NODE1_IP` to `NODE4_IP` lines), then:
-```bash
-git add config/cluster.env
-git commit -m "Set ZeroTier IPs"
-git push
-```
+If your ZeroTier IP ever changes, tell the team lead (Srikanth) so `config/cluster.env` can be updated and pushed.
 
 ### Step 2 · ALL 4 nodes · get the code
 
@@ -316,6 +317,9 @@ Next session: start again from **Part 2**. Your data is still there in HDFS.
 | Problem | What to do |
 |---|---|
 | `permission denied` | Put `bash` in front of the command. |
+| `Unable to load native-hadoop library` (Node 2, arm64) | Harmless warning, ignore it. |
+| `Python in worker has different version` | Nodes 1, 2, 3 must run the same Python minor version. Check with `python3 --version` on each. |
+| A node can't be reached | `sudo zerotier-cli listnetworks` must say `OK`. Restart with `sudo systemctl restart zerotier-one`. |
 | `NODE_ID not set` | You skipped Step 3. Create `config/local.env`. |
 | Only **1** live DataNode | On Node 3: run `jps`. If `DataNode` is missing, run `bash vm3_compute/start_compute.sh` again. |
 | Only **1** Spark worker | On Node 2: `bash vm2_storage/start_storage.sh` (Node 3's master must already be running). |
