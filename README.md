@@ -4,6 +4,8 @@ A small Google, split across **4 VMs connected by ZeroTier**. Documents are inge
 
 Every VM clones this same repo. Each team member works in their own `vmN_*` folder, and all of them share `common/`, `config/` and `scripts/`.
 
+> **New to the project? Start with [EXECUTION_GUIDE.md](EXECUTION_GUIDE.md)**: a simple step-by-step of who runs what, and when.
+
 ```
                        ZeroTier private network (10.147.17.0/24 - use your own IPs)
  ┌──────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────┐
